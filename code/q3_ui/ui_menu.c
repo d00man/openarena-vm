@@ -92,8 +92,13 @@ static const char *s_main_aimingmode_items[] = {
 	NULL
 };
 
+
 static const char *main_voicechat_items[] = {
+# ifdef USE_VOIP
 	"off", "shake and talk", "listen only", NULL
+# else
+	"experimental", NULL
+# endif
 };
 
 /*
