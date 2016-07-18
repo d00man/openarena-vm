@@ -1622,7 +1622,9 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	// so the new gametypes work
 	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gameType" ) );
 	// Disable VOIP for offline games
-	trap_Cvar_SetValue( "sv_voip", multiplayer );
+	# ifdef USE_VOIP
+	  trap_Cvar_SetValue( "sv_voip", multiplayer );
+	# endif
 
 	ServerOptions_Cache();
 

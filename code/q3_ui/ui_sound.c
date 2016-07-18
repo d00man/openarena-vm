@@ -57,7 +57,11 @@ static const char *quality_items[] = {
 };
 
 static const char *sound_voicechat_items[] = {
+# ifdef USE_VOIP
 	"Off", "Shake and talk", "Listen only", NULL
+# else
+	"Experimental", NULL
+# endif
 };
 
 typedef struct {
@@ -158,9 +162,11 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 		soundOptionsInfo.openal.curvalue = (int)trap_Cvar_VariableValue( "s_useopenal" );
 		break;
 
+	# ifdef USE_VOIP
 	case ID_VOICECHAT:
 		trap_Cvar_SetValue( "cl_voip", soundOptionsInfo.voicechat.curvalue );
 		break;
+	# endif
 
 	case ID_SHAKESENSITIVITY:
 		trap_Cvar_SetValue( "cl_voipAccelShakeThreshold", 100000 - soundOptionsInfo.shakesensitivity.curvalue );

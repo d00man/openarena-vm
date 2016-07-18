@@ -57,7 +57,11 @@ const char *rate_items[] = {
 };
 
 static const char *network_voicechat_items[] = {
+# ifdef USE_VOIP
 	"Off", "Shake and talk", "Listen only", NULL
+# else
+	"Experimental", NULL
+# endif
 };
 
 typedef struct {
