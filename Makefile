@@ -353,7 +353,10 @@ ifeq ($(PLATFORM),darwin)
     BASE_CFLAGS += -faltivec
   endif
   ifeq ($(ARCH),i386)
-    OPTIMIZE += -march=prescott -mfpmath=sse
+    # clang doesn't support '-march=prescott' parameter
+    # OPTIMIZE += -march=prescott -mfpmath=sse
+    OPTIMIZE += -m32 -mfpmath=sse
+
     # x86 vm will crash without -mstackrealign since MMX instructions will be
     # used no matter what and they corrupt the frame pointer in VM calls
     BASE_CFLAGS += -mstackrealign
@@ -397,7 +400,9 @@ ifeq ($(PLATFORM),darwin)
   CLIENT_LIBS += -framework Cocoa -framework IOKit -framework OpenGL \
     $(LIBSDIR)/macosx/libSDL-1.2.0.dylib
 
-  OPTIMIZE += -ffast-math -falign-loops=16
+  # clang doesn't support -falign-loops
+  # OPTIMIZE += -ffast-math -falign-loops=16
+  OPTIMIZE += -ffast-math
 
   ifneq ($(HAVE_VM_COMPILED),true)
     BASE_CFLAGS += -DNO_VM_COMPILED
@@ -414,6 +419,12 @@ ifeq ($(PLATFORM),darwin)
   NOTSHLIBCFLAGS=-mdynamic-no-pic
 
   TOOLS_CFLAGS += -DMACOS_X
+
+  # clang needs to be instructed to generate 32 bit code
+  TOOLS_OPTIMIZE += -m32
+
+  LDFLAGS += -arch i386
+  TOOLS_LDFLAGS += -arch i386
 
 else # ifeq darwin
 
@@ -969,6 +980,7 @@ targets: makedirs
 	@echo "  COMPILE_PLATFORM: $(COMPILE_PLATFORM)"
 	@echo "  COMPILE_ARCH: $(COMPILE_ARCH)"
 	@echo "  CC: $(CC)"
+	@echo "  LD: $(LD)"
 	@echo ""
 	@echo "  CFLAGS:"
 	-@for i in $(CFLAGS); \
@@ -1033,13 +1045,13 @@ makedirs:
 # QVM BUILD TOOLS
 #############################################################################
 
-TOOLS_OPTIMIZE = -g -O2 -Wall -fno-strict-aliasing
-TOOLS_CFLAGS = $(TOOLS_OPTIMIZE) \
+TOOLS_OPTIMIZE += -g -O2 -Wall -fno-strict-aliasing
+TOOLS_CFLAGS += $(TOOLS_OPTIMIZE) \
                -DTEMPDIR=\"$(TEMPDIR)\" -DSYSTEM=\"\" \
                -I$(Q3LCCSRCDIR) \
                -I$(LBURGDIR)
 TOOLS_LIBS =
-TOOLS_LDFLAGS =
+#TOOLS_LDFLAGS =
 
 ifeq ($(GENERATE_DEPENDENCIES),1)
 	TOOLS_CFLAGS += -MMD
